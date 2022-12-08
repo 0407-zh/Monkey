@@ -157,8 +157,6 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 
 // 解析表达式语句
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	defer untrace(trace("parseExpressionStatement"))
-
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	stmt.Expression = p.parseExpression(LOWEST)
 
@@ -171,8 +169,6 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 
 // 解析表达式
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	defer untrace(trace("parseExpression"))
-
 	// 检查前缀位置是否有与当前词法单元类型关联的解析函数
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
@@ -202,8 +198,6 @@ func (p *Parser) parseIdentifier() ast.Expression {
 
 // 解析整数字面量
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	defer untrace(trace("parseIntegerLiteral"))
-
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
@@ -220,8 +214,6 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 // 解析前缀表达式
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	defer untrace(trace("parsePrefixExpression"))
-
 	expression := &ast.PrefixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
@@ -234,8 +226,6 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 
 // 解析中缀表达式
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	defer untrace(trace("parseInfixExpression"))
-
 	expression := &ast.InfixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
@@ -339,7 +329,7 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 
 // 解析函数参数列表
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
-	identifiers := []*ast.Identifier{}
+	var identifiers []*ast.Identifier
 
 	if p.peekTokenIs(token.RPAREN) {
 		p.nextToken()
