@@ -32,14 +32,22 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		if _, err = io.WriteString(out, program.String()); err != nil {
+			return
+		}
+		if _, err = io.WriteString(out, "\n"); err != nil {
+			return
+		}
 	}
 }
 
 func printParseErrors(out io.Writer, errors []string) {
-	io.WriteString(out, " parser errors:\n")
+	if _, err := io.WriteString(out, " parser errors:\n"); err != nil {
+		return
+	}
 	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg+"\n")
+		if _, err := io.WriteString(out, "\t"+msg+"\n"); err != nil {
+			return
+		}
 	}
 }
