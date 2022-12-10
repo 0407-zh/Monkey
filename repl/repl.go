@@ -3,6 +3,7 @@ package repl
 import (
 	"Monkey/evaluator"
 	"Monkey/lexer"
+	"Monkey/object"
 	"Monkey/parser"
 	"bufio"
 	"fmt"
@@ -13,6 +14,7 @@ const PROMPT = ">>> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		_, err := fmt.Fprintf(out, PROMPT)
@@ -34,7 +36,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program) // 求值器
+		evaluated := evaluator.Eval(program, env) // 求值器
 		if evaluated != nil {
 			if _, err = io.WriteString(out, evaluated.Inspect()); err != nil {
 				return
