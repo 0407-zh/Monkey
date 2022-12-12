@@ -14,6 +14,7 @@ const (
 	IDENT = "IDENT"
 	INT   = "INT"
 	// TODO 支持浮点数、十六进制数、八进制数
+	STRING = "STRING"
 
 	ASSIGN   = "="
 	PLUS     = "+"
