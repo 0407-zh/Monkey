@@ -11,7 +11,8 @@ type Instructions []byte // 指令
 type Opcode byte // 操作码
 
 const (
-	OpConstant Opcode = iota
+	OpConstant Opcode = iota // 常量操作码
+	OpAdd                    // 相加操作码
 )
 
 type Definition struct {
@@ -21,6 +22,7 @@ type Definition struct {
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
+	OpAdd:      {"OpAdd", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
@@ -77,6 +79,7 @@ func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 	return operands, offset
 }
 
+// ReadUint16 解析字节码中的操作数
 func ReadUint16(ins Instructions) uint16 {
 	return binary.BigEndian.Uint16(ins)
 }
@@ -111,6 +114,8 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 	}
 
 	switch operandCount {
+	case 0:
+		return def.Name
 	case 1:
 		return fmt.Sprintf("%s %d", def.Name, operands[0])
 	}
