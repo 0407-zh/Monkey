@@ -8,6 +8,7 @@ import (
 )
 
 const StackSize = 2048 // 虚拟机栈大小
+const GlobalSize = 65536
 
 var True = &object.Boolean{Value: true}
 var False = &object.Boolean{Value: false}
@@ -20,6 +21,8 @@ type VM struct {
 
 	stack []object.Object // 虚拟机栈
 	sp    int             // 栈指针， 始终指向栈中的下一位，即当前索引加一
+
+	globals []object.Object // 全局存储
 }
 
 // New 生成虚拟机实例
@@ -30,7 +33,15 @@ func New(bytecode *compiler.Bytecode) *VM {
 
 		stack: make([]object.Object, StackSize),
 		sp:    0,
+
+		globals: make([]object.Object, GlobalSize),
 	}
+}
+
+func NewWithGlobalsStore(bytecode *compiler.Bytecode, s []object.Object) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+	return vm
 }
 
 // Run 启动虚拟机
@@ -88,6 +99,18 @@ func (vm *VM) Run() error {
 			}
 		case code.OpNull:
 			if err := vm.push(Null); err != nil {
+				return err
+			}
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			vm.globals[globalIndex] = vm.pop()
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			if err := vm.push(vm.globals[globalIndex]); err != nil {
 				return err
 			}
 		}
